@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { ApiTrack } from "@/hooks/types";
-import Card from "./components/card";
+import Card from "../components/card";
 import { searchMusic } from "@/hooks/actions";
 
 export default function Index() {
@@ -108,7 +108,7 @@ export default function Index() {
               style={styles.searchInput}
             />
             {query.length > 0 && (
-              <Pressable onPress={() => setQuery("")} hitSlop={10}>
+              <Pressable disabled={loading} onPress={() => setQuery("")} hitSlop={10}>
                 <Ionicons
                   name="close-circle"
                   size={18}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { ApiTrack } from "@/hooks/types";
+import WebView from "react-native-webview";
 
 type cardProps = {
   track: ApiTrack;
@@ -20,6 +21,32 @@ const Card = ({ track }: cardProps) => {
     setDownloaded(true);
   };
   const isPlaying = playingId === track.id;
+
+  const getPlayer = (id: string) => {
+    return `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05060A; overflow: hidden; }
+            </style>
+          </head>
+          <body>
+            <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 56.25%;">
+              <iframe 
+                src="https://www.youtube.com/embed/${id}?autoplay=1&controls=0&rel=0&showinfo=0&mute=0" 
+                style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;" 
+                allowfullscreen 
+                scrolling="no" 
+                allow="accelerometer *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; web-share *;" 
+                referrerpolicy="strict-origin">
+              </iframe>
+            </div>
+          </body>
+        </html>
+      `;
+  };
   return (
     <View key={track.id} style={styles.trackGlass}>
       <View style={styles.cardTopEdge} />
@@ -122,23 +149,7 @@ const Card = ({ track }: cardProps) => {
             }}
           >
             {playerWidth > 0 && (
-              <YoutubePlayer
-                volume={100}
-                width={playerWidth}
-                forceAndroidAutoplay={true}
-                height={Math.round((playerWidth * 9) / 16)}
-                controls={false}
-                preventFullScreen={true}
-                videoId={track.id}
-                play={isPlaying}
-                webViewProps={{
-                  allowsFullscreenVideo: false,
-                  androidLayerType: "hardware",
-                }}
-                initialPlayerParams={{
-                  controls: false,
-                  rel: false,
-                }}
+              <WebView
                 style={[
                   styles.webView,
                   {
@@ -146,6 +157,15 @@ const Card = ({ track }: cardProps) => {
                     height: Math.round((playerWidth * 9) / 16),
                   },
                 ]}
+                source={{
+                  html: getPlayer(track.id),
+                  baseUrl: "https://youtube.com",
+                }}
+                javaScriptEnabled={true}
+                mediaPlaybackRequiresUserAction={false}
+                allowsFullscreenVideo={false}
+                androidLayerType="hardware"
+                originWhitelist={["*"]}
               />
             )}
           </View>
